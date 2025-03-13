@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Multiplayer Blackjack</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Room Selection Screen -->
+    <div id="roomSelection" class="screen">
+      <h1>Multiplayer Blackjack</h1>
+      <h2>Select a Room</h2>
+      <div id="roomsContainer"></div>
+    </div>
+    
+    <!-- Game Room Screen -->
+    <div id="gameRoom" class="screen hidden">
+      <div class="header">
+        <div id="roomInfo">Room: <span id="roomName"></span></div>
+        <div id="credits">Credits: <span id="creditsAmount">1000</span></div>
+      </div>
+      
+      <!-- Waiting for round -->
+      <div id="waitingScreen">
+        <p>Waiting for the next round to begin...</p>
+      </div>
+      
+      <!-- Betting Interface -->
+      <div id="bettingInterface" class="hidden">
+        <h2>Place Your Bet</h2>
+        <div id="betDisplay">Bet: <span id="currentBet">0</span></div>
+        <div id="betButtons">
+          <button data-increment="-500">-500</button>
+          <button data-increment="-250">-250</button>
+          <button data-increment="-100">-100</button>
+          <button data-increment="-50">-50</button>
+          <button data-increment="-25">-25</button>
+          <button data-increment="-5">-5</button>
+          <button data-increment="-1">-1</button>
+          <button data-increment="1">+1</button>
+          <button data-increment="5">+5</button>
+          <button data-increment="25">+25</button>
+          <button data-increment="50">+50</button>
+          <button data-increment="100">+100</button>
+          <button data-increment="250">+250</button>
+          <button data-increment="500">+500</button>
+        </div>
+        <button id="placeBet">Place Bet</button>
+      </div>
+      
+      <!-- Blackjack Game Table -->
+      <div id="gameTable" class="hidden">
+        <h2>Blackjack Table</h2>
+        <div id="dealerArea">
+          <h3>Dealer's Hand</h3>
+          <div class="cards" id="dealerCards"></div>
+        </div>
+        <div id="playerArea">
+          <h3>Your Hand</h3>
+          <div class="cards" id="playerCards"></div>
+        </div>
+        <div id="gameActions" class="hidden">
+          <button id="hit">Hit</button>
+          <button id="stand">Stand</button>
+        </div>
+        <div id="gameResult" class="hidden">
+          <h3 id="resultMessage"></h3>
+          <button id="newRound">New Round</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="script.js"></script>
+</body>
+</html>
