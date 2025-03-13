@@ -79,10 +79,8 @@
     const creditsSpan = document.getElementById("credits");
     const currentBetSpan = document.getElementById("currentBet");
 
-    // For local dev: ws://, for HTTPS prod: wss://
-    // This picks wss if you're on https, ws if you're on http
-    const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const ws = new WebSocket(wsProtocol + "//" + window.location.host);
+    // Use your Render WebSocket URL from the old scoreboard code:
+    const ws = new WebSocket("wss://renderwebsocket-u5u4.onrender.com");
 
     let playerId = "player-" + Math.floor(Math.random() * 100000);
     let currentRoom = "";
