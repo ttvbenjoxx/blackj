@@ -21,7 +21,7 @@ const dealerHandDiv = document.getElementById("dealerHand");
 // If deploying to Render, replace with your WebSocket URL or dynamic logic
 // For your old scoreboard Render URL: "wss://renderwebsocket-u5u4.onrender.com"
 const wsProtocol = (location.protocol === "https:") ? "wss://" : "ws://";
-const ws = new WebSocket(wsProtocol + window.location.host);
+const ws = new WebSocket("wss://renderwebsocket-u5u4.onrender.com");
 
 let playerId = "player-" + Math.floor(Math.random() * 100000);
 let currentRoom = "";
