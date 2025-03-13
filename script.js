@@ -1,26 +1,17 @@
-/*********************************************************
+/******************************************************
  * script.js
- * 
- * - Connects to the server's WebSocket
- * - Joins a room, starts a round, places bets, hits, stands
- * - Shows/hides sections (bet screen, etc.) based on messages
- *********************************************************/
+ * - Connects to wss://renderwebsocket-u5u4.onrender.com
+ * - Logs all events in the console for debugging
+ ******************************************************/
 const connectionStatus = document.getElementById("connectionStatus");
-const roomSelection = document.getElementById("roomSelection");
-const gameSection = document.getElementById("game");
+const roomsDiv = document.getElementById("rooms");
+const gameDiv = document.getElementById("game");
 const roomLabel = document.getElementById("roomLabel");
 const creditsSpan = document.getElementById("credits");
 const betSection = document.getElementById("betSection");
 const currentBetSpan = document.getElementById("currentBet");
-const playerHandSection = document.getElementById("playerHandSection");
-const playerHandDiv = document.getElementById("playerHand");
-const dealerHandSection = document.getElementById("dealerHandSection");
-const dealerHandDiv = document.getElementById("dealerHand");
 
-// If running locally, you might use ws://localhost:3000
-// If deploying to Render, replace with your WebSocket URL or dynamic logic
-// For your old scoreboard Render URL: "wss://renderwebsocket-u5u4.onrender.com"
-const wsProtocol = (location.protocol === "https:") ? "wss://" : "ws://";
+// HARDCODED RENDER URL
 const ws = new WebSocket("wss://renderwebsocket-u5u4.onrender.com");
 
 let playerId = "player-" + Math.floor(Math.random() * 100000);
@@ -28,68 +19,57 @@ let currentRoom = "";
 let credits = 1000;
 let currentBet = 0;
 
+// Log connection events
 ws.onopen = () => {
+  console.log("WebSocket connected!");
   connectionStatus.textContent = "Connected";
 };
 ws.onclose = () => {
+  console.log("WebSocket closed.");
   connectionStatus.textContent = "Disconnected";
 };
-ws.onerror = () => {
+ws.onerror = (err) => {
+  console.error("WebSocket error:", err);
   connectionStatus.textContent = "Disconnected";
 };
 
+// Log incoming messages
 ws.onmessage = (event) => {
+  console.log("Received:", event.data);
   try {
     const data = JSON.parse(event.data);
 
+    // Example: if the server sends "room_update"
     if (data.type === "room_update" && data.roomName === currentRoom) {
-      // The entire room state
-      const roomState = data.room;
-      // Get this player's data
-      const p = roomState.players[playerId];
+      // If your server includes updated credits/bet
+      const p = data.room.players[playerId];
       if (p) {
         credits = p.credits;
         currentBet = p.bet;
         creditsSpan.textContent = credits;
         currentBetSpan.textContent = currentBet;
-        // Show player's hand
-        displayHand(playerHandDiv, p.hand);
-      }
-      // Show dealer's hand if round is active
-      if (roomState.roundActive) {
-        dealerHandSection.classList.remove("hidden");
-        displayHand(dealerHandDiv, roomState.dealerHand);
-      } else {
-        dealerHandSection.classList.add("hidden");
-        dealerHandDiv.innerHTML = "";
       }
     }
-
-    // Round start => show bet screen, reset UI
+    // Example: show bet section on round_start
     if (data.type === "round_start" && data.roomName === currentRoom) {
       betSection.classList.remove("hidden");
-      playerHandSection.classList.remove("hidden");
-      // Clear the hands for fresh display
-      playerHandDiv.innerHTML = "";
-      dealerHandDiv.innerHTML = "";
     }
-
-    // Round end => hide bet screen
+    // Example: hide bet section on round_end
     if (data.type === "round_end" && data.roomName === currentRoom) {
       betSection.classList.add("hidden");
-      // After the round ends, you might also hide hit/stand if you want
     }
   } catch (err) {
-    console.error("Error parsing message:", err);
+    console.error("Failed to parse message:", err);
   }
 };
 
-/** Join a room */
+// Join a room
 function joinRoom(roomName) {
+  console.log("Joining room:", roomName);
   currentRoom = roomName;
   roomLabel.textContent = roomName;
-  roomSelection.classList.add("hidden");
-  gameSection.classList.remove("hidden");
+  roomsDiv.classList.add("hidden");
+  gameDiv.classList.remove("hidden");
 
   ws.send(JSON.stringify({
     type: "join",
@@ -99,61 +79,23 @@ function joinRoom(roomName) {
   }));
 }
 
-/** Start round => server deals new cards, sends "round_start" */
-function startRound() {
-  if (!currentRoom) return;
-  ws.send(JSON.stringify({
-    type: "start_round",
-    roomName: currentRoom
-  }));
-}
-
-/** Adjust bet by a certain amount */
+// Adjust bet
 function adjustBet(amount) {
   currentBet += amount;
   if (currentBet < 0) currentBet = 0;
   if (currentBet > credits) currentBet = credits;
   currentBetSpan.textContent = currentBet;
+  console.log("Bet adjusted to:", currentBet);
 }
 
-/** Send bet to server */
+// Place bet
 function placeBet() {
   if (!currentRoom) return;
+  console.log("Placing bet:", currentBet);
   ws.send(JSON.stringify({
     type: "bet",
     roomName: currentRoom,
     playerId,
     betAmount: currentBet
   }));
-}
-
-/** "Hit" => request a card from the server */
-function hit() {
-  if (!currentRoom) return;
-  ws.send(JSON.stringify({
-    type: "hit",
-    roomName: currentRoom,
-    playerId
-  }));
-}
-
-/** "Stand" => finish your turn */
-function stand() {
-  if (!currentRoom) return;
-  ws.send(JSON.stringify({
-    type: "stand",
-    roomName: currentRoom,
-    playerId
-  }));
-}
-
-/** Display a hand of cards in a given container */
-function displayHand(container, hand) {
-  container.innerHTML = "";
-  hand.forEach(card => {
-    const cardDiv = document.createElement("div");
-    cardDiv.className = "card";
-    cardDiv.textContent = card.value + card.suit;
-    container.appendChild(cardDiv);
-  });
 }
