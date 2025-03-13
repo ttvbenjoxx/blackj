@@ -10,18 +10,22 @@
   <div id="connectionStatus">Disconnected</div>
 
   <!-- Room selection -->
-  <div id="rooms">
+  <div id="roomSelection">
     <button class="room-btn" onclick="joinRoom('Room 1')">Join Room 1</button>
     <button class="room-btn" onclick="joinRoom('Room 2')">Join Room 2</button>
     <button class="room-btn" onclick="joinRoom('Room 3')">Join Room 3</button>
   </div>
 
-  <!-- Game area -->
-  <div id="game">
-    <h2 id="roomLabel">No room joined</h2>
+  <!-- Main game UI -->
+  <div id="game" class="hidden">
+    <h2>Current Room: <span id="roomLabel"></span></h2>
     <p>Credits: <span id="credits">0</span></p>
-    
-    <!-- Hidden until a new round starts -->
+
+    <div id="roundActions">
+      <button id="startRoundBtn" onclick="startRound()">Start Round</button>
+    </div>
+
+    <!-- Only visible during a round -->
     <div id="betSection" class="hidden">
       <h3>Place Your Bet</h3>
       <div id="betControls">
@@ -41,7 +45,21 @@
         <button onclick="adjustBet(500)">+500</button>
       </div>
       <p>Current Bet: <span id="currentBet">0</span></p>
-      <button id="placeBetBtn" onclick="placeBet()">Place Bet</button>
+      <button onclick="placeBet()">Place Bet</button>
+    </div>
+
+    <!-- Player Hand -->
+    <div id="playerHandSection" class="hidden">
+      <h3>Your Hand</h3>
+      <div id="playerHand"></div>
+      <button id="hitBtn" onclick="hit()">Hit</button>
+      <button id="standBtn" onclick="stand()">Stand</button>
+    </div>
+
+    <!-- Dealer Hand -->
+    <div id="dealerHandSection" class="hidden">
+      <h3>Dealer's Hand</h3>
+      <div id="dealerHand"></div>
     </div>
   </div>
 
