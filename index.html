@@ -3,144 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <title>Multiplayer Blackjack</title>
-  <style>
-    body {
-      margin: 0; padding: 0;
-      font-family: Arial, sans-serif;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      height: 100vh; color: #333;
-      background: linear-gradient(135deg, #84fab0, #8fd3f4);
-    }
-    #connectionStatus {
-      position: absolute; top: 10px; right: 10px;
-      font-size: 0.8rem; opacity: 0.8;
-    }
-    #rooms {
-      margin: 1rem;
-    }
-    .room-btn {
-      margin: 0.5rem;
-      padding: 0.75rem 1rem;
-      cursor: pointer;
-      background: #444; color: #fff;
-      border: none; border-radius: 6px;
-    }
-    #game {
-      text-align: center;
-      margin-top: 2rem;
-    }
-    #betControls button {
-      margin: 0.2rem;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1>Multiplayer Blackjack</h1>
   <div id="connectionStatus">Disconnected</div>
 
-  <!-- Simple "Room" buttons -->
+  <!-- Room selection -->
   <div id="rooms">
     <button class="room-btn" onclick="joinRoom('Room 1')">Join Room 1</button>
     <button class="room-btn" onclick="joinRoom('Room 2')">Join Room 2</button>
     <button class="room-btn" onclick="joinRoom('Room 3')">Join Room 3</button>
   </div>
 
-  <!-- Main game UI -->
+  <!-- Game area -->
   <div id="game">
     <h2 id="roomLabel">No room joined</h2>
     <p>Credits: <span id="credits">0</span></p>
     
-    <div id="betControls">
-      <button onclick="adjustBet(-500)">-500</button>
-      <button onclick="adjustBet(-250)">-250</button>
-      <button onclick="adjustBet(-100)">-100</button>
-      <button onclick="adjustBet(-50)">-50</button>
-      <button onclick="adjustBet(-25)">-25</button>
-      <button onclick="adjustBet(-5)">-5</button>
-      <button onclick="adjustBet(-1)">-1</button>
-      <button onclick="adjustBet(1)">+1</button>
-      <button onclick="adjustBet(5)">+5</button>
-      <button onclick="adjustBet(25)">+25</button>
-      <button onclick="adjustBet(50)">+50</button>
-      <button onclick="adjustBet(100)">+100</button>
-      <button onclick="adjustBet(250)">+250</button>
-      <button onclick="adjustBet(500)">+500</button>
+    <!-- Hidden until a new round starts -->
+    <div id="betSection" class="hidden">
+      <h3>Place Your Bet</h3>
+      <div id="betControls">
+        <button onclick="adjustBet(-500)">-500</button>
+        <button onclick="adjustBet(-250)">-250</button>
+        <button onclick="adjustBet(-100)">-100</button>
+        <button onclick="adjustBet(-50)">-50</button>
+        <button onclick="adjustBet(-25)">-25</button>
+        <button onclick="adjustBet(-5)">-5</button>
+        <button onclick="adjustBet(-1)">-1</button>
+        <button onclick="adjustBet(1)">+1</button>
+        <button onclick="adjustBet(5)">+5</button>
+        <button onclick="adjustBet(25)">+25</button>
+        <button onclick="adjustBet(50)">+50</button>
+        <button onclick="adjustBet(100)">+100</button>
+        <button onclick="adjustBet(250)">+250</button>
+        <button onclick="adjustBet(500)">+500</button>
+      </div>
+      <p>Current Bet: <span id="currentBet">0</span></p>
+      <button id="placeBetBtn" onclick="placeBet()">Place Bet</button>
     </div>
-    <p>Bet: <span id="currentBet">0</span></p>
-    <button onclick="placeBet()">Place Bet</button>
   </div>
 
-  <script>
-    const connectionStatus = document.getElementById("connectionStatus");
-    const roomLabel = document.getElementById("roomLabel");
-    const creditsSpan = document.getElementById("credits");
-    const currentBetSpan = document.getElementById("currentBet");
-
-    // Use your Render WebSocket URL from the old scoreboard code:
-    const ws = new WebSocket("wss://renderwebsocket-u5u4.onrender.com");
-
-    let playerId = "player-" + Math.floor(Math.random() * 100000);
-    let currentRoom = "";
-    let credits = 1000;
-    let currentBet = 0;
-
-    // WebSocket connection events
-    ws.onopen = () => (connectionStatus.textContent = "Connected");
-    ws.onclose = () => (connectionStatus.textContent = "Disconnected");
-    ws.onerror = () => (connectionStatus.textContent = "Disconnected");
-
-    // Handle incoming messages
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === "room_update" && data.roomName === currentRoom) {
-          // Grab this player's info from the updated room
-          const playerData = data.room.players[playerId];
-          if (playerData) {
-            credits = playerData.credits;
-            currentBet = playerData.bet;
-            creditsSpan.textContent = credits;
-            currentBetSpan.textContent = currentBet;
-          }
-        }
-      } catch (err) {
-        console.error("Error parsing message:", err);
-      }
-    };
-
-    // Join a room
-    function joinRoom(roomName) {
-      currentRoom = roomName;
-      roomLabel.textContent = "Joined " + roomName;
-      ws.send(JSON.stringify({
-        type: "join",
-        roomName,
-        playerId,
-        name: "Anonymous"
-      }));
-    }
-
-    // Adjust bet
-    function adjustBet(amount) {
-      currentBet += amount;
-      if (currentBet < 0) currentBet = 0;
-      if (currentBet > credits) currentBet = credits;
-      currentBetSpan.textContent = currentBet;
-    }
-
-    // Send bet to server
-    function placeBet() {
-      if (!currentRoom) return;
-      ws.send(JSON.stringify({
-        type: "bet",
-        roomName: currentRoom,
-        playerId,
-        betAmount: currentBet
-      }));
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
