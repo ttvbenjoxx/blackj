@@ -1,7 +1,7 @@
 {
   "name": "multiplayer-blackjack",
   "version": "1.0.0",
-  "description": "Multiplayer Blackjack server with Node, Express, and ws",
+  "description": "A more functional multiplayer Blackjack with Node, Express, and ws",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
