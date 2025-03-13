@@ -1,7 +1,7 @@
 {
-  "name": "multiplayer-blackjack",
+  "name": "blackjack-render",
   "version": "1.0.0",
-  "description": "A more functional multiplayer Blackjack with Node, Express, and ws",
+  "description": "Multiplayer Blackjack on Render using wss://renderwebsocket-u5u4.onrender.com",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
